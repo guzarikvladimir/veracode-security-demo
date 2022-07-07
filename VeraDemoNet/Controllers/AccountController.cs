@@ -535,7 +535,7 @@ namespace VeraDemoNet.Controllers
             // Use the user class to get the hashed password.
             var dbUser = new User
             {
-                Password = Md5Hash(user.Password),
+                Password = Hash(user.Password),
                 CreatedAt = DateTime.Now,
                 UserName = user.UserName,
                 RealName = user.RealName,
