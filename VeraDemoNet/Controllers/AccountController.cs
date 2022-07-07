@@ -8,8 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
@@ -42,10 +40,10 @@ namespace VeraDemoNet.Controllers
                 return GetLogOut();
             }
 
-
             var userDetailsCookie = Request.Cookies[COOKIE_NAME];
 
-            if (userDetailsCookie == null || userDetailsCookie.Value.Length == 0)
+            if (userDetailsCookie == null || userDetailsCookie.Value.Length == 0 ||
+                !TryDeserialize(userDetailsCookie.Value, out CustomSerializeModel deserializedUser))
             {
                 logger.Info("No user cookie");
                 Session["username"] = "";
@@ -55,23 +53,7 @@ namespace VeraDemoNet.Controllers
             }
 
             logger.Info("User details were remembered");
-            var unencodedUserDetails = Convert.FromBase64String(userDetailsCookie.Value);
-
-            CustomSerializeModel deserializedUser;
-
-            using (MemoryStream memoryStream = new MemoryStream(unencodedUserDetails))
-            {
-                var binaryFormatter = new BinaryFormatter();
-
-                // set memory stream position to starting point
-                memoryStream.Position = 0;
-
-                // Deserializes a stream into an object graph and return as a object.
-                /* START BAD CODE */
-                deserializedUser = binaryFormatter.Deserialize(memoryStream) as CustomSerializeModel;
-                /* END BAD CODE */
-                logger.Info("User details were retrieved for user: " + deserializedUser.UserName);
-            }
+            logger.Info("User details were retrieved for user: " + deserializedUser.UserName);
 
             Session["username"] = deserializedUser.UserName;
 
@@ -116,17 +98,12 @@ namespace VeraDemoNet.Controllers
                             RealName = userDetails.RealName
                         };
 
-                        using (var userModelStream = new MemoryStream())
-                        {
-                            IFormatter formatter = new BinaryFormatter();
-                            formatter.Serialize(userModelStream, userModel);
-                            var faCookie =
-                                new HttpCookie(COOKIE_NAME, Convert.ToBase64String(userModelStream.GetBuffer()))
-                                {
-                                    Expires = DateTime.Now.AddDays(30)
-                                };
-                            Response.Cookies.Add(faCookie);
-                        }
+                        var faCookie =
+                            new HttpCookie(COOKIE_NAME, JsonConvert.SerializeObject(userModel))
+                            {
+                                Expires = DateTime.Now.AddDays(30)
+                            };
+                        Response.Cookies.Add(faCookie);
                     }
 
                     if (string.IsNullOrEmpty(ReturnUrl))
@@ -585,6 +562,20 @@ namespace VeraDemoNet.Controllers
             //EmailUser(userName);
 
             return RedirectToAction("Login", "Account", new LoginView { UserName = user.UserName });
+        }
+
+        private bool TryDeserialize<T>(string value, out T model)
+        {
+            try
+            {
+                model = JsonConvert.DeserializeObject<T>(value);
+                return true;
+            }
+            catch
+            {
+                model = default;
+                return false;
+            }
         }
     }
 }
