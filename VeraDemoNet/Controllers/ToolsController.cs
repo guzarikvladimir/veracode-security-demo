@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Web.Hosting;
 using System.Web.Mvc;
+using VeraDemoNet.Helper;
 using VeraDemoNet.Models;
 
 namespace VeraDemoNet.Controllers
@@ -14,7 +15,7 @@ namespace VeraDemoNet.Controllers
 
         public ToolsController()
         {
-            logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);    
+            logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         }
 
         [HttpGet, ActionName("Tools")]
@@ -35,6 +36,9 @@ namespace VeraDemoNet.Controllers
             {
                 return RedirectToLogin(HttpContext.Request.RawUrl);
             }
+
+            ToolsHelper.AssertIsSingleArgument(host);
+            ToolsHelper.AssertIsSingleArgument(fortuneFile);
 
             var viewModel = new ToolViewModel();
             viewModel.Host = host;
@@ -81,7 +85,7 @@ namespace VeraDemoNet.Controllers
         {
             var output = new StringBuilder();
 
-            if (string.IsNullOrEmpty(fortuneFile)) 
+            if (string.IsNullOrEmpty(fortuneFile))
             {
                 fortuneFile = "funny.txt";
             }
@@ -95,8 +99,8 @@ namespace VeraDemoNet.Controllers
 
                 var proc = CreateStdOutProcess(fileName, arguments);
 
-                proc.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e) { output.Append(e.Data); };
-                proc.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e) { output.Append(e.Data + "\n"); };
+                proc.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e) { output.Append(e.Data); };
+                proc.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e) { output.Append(e.Data + "\n"); };
 
                 proc.Start();
                 proc.BeginOutputReadLine();
