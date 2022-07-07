@@ -176,6 +176,7 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\ResetController.cs" />
     <Compile Include="Helper\CommandHelper.cs" />
+    <Compile Include="Helper\ImageHelper.cs" />
     <Compile Include="Helper\InputHelper.cs" />
     <Compile Include="Helper\ToolsHelper.cs" />
     <Compile Include="Models\BlabSearchResultViewModel.cs" />
@@ -348,7 +349,7 @@
   </Target>
   <Target Name="BeforeBuild">
     <TransformXml Source="Web.config" Transform="Web.$(Configuration).config" Destination="Web.config" />
-  </Target>     
+  </Target>
   <Target Name="AfterBuild">
   </Target>
 </Project>

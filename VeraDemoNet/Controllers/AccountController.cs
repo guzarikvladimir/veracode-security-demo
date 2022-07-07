@@ -24,6 +24,7 @@ namespace VeraDemoNet.Controllers
         protected readonly log4net.ILog logger;
 
         private const string COOKIE_NAME = "UserDetails";
+        private static readonly string[] ImageExtensions = { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
 
         public AccountController()
         {
@@ -232,6 +233,7 @@ namespace VeraDemoNet.Controllers
             // Update user profile image
             if (file != null && file.ContentLength > 0)
             {
+                ImageHelper.AssertIsValid(file.InputStream);
                 // Get old image name, if any, to delete
                 var oldImage = imageDir + userName + ".png";
 
