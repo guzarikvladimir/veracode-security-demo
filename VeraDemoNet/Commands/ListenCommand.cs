@@ -22,8 +22,8 @@ namespace VeraDemoNet.Commands
             {
 
                 action.CommandText = listenerInsertQuery;
-                action.Parameters.Add(new SqlParameter {ParameterName = "@blabber", Value = blabberUsername});
-                action.Parameters.Add(new SqlParameter {ParameterName = "@listener", Value = username});
+                action.Parameters.Add(new SqlParameter { ParameterName = "@blabber", Value = blabberUsername });
+                action.Parameters.Add(new SqlParameter { ParameterName = "@listener", Value = username });
                 action.ExecuteNonQuery();
             }
 
@@ -43,15 +43,17 @@ namespace VeraDemoNet.Commands
                 }
             }
 
-            
+
             /* START BAD CODE */
             var listeningEvent = username + " started listening to " + blabberUsername + "(" + blabberName + ")";
-            var eventQuery = "INSERT INTO users_history (blabber, event) VALUES ('" + username + "', '" + listeningEvent + "')";
+            var eventQuery = "INSERT INTO users_history (blabber, event) VALUES (@username, @event)";
 
             using (var sqlStatement = connect.CreateCommand())
             {
                 logger.Info(eventQuery);
                 sqlStatement.CommandText = eventQuery;
+                sqlStatement.Parameters.Add(new SqlParameter("@username", username));
+                sqlStatement.Parameters.Add(new SqlParameter("@event", listeningEvent));
                 sqlStatement.ExecuteNonQuery();
             }
 

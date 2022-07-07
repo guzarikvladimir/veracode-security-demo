@@ -14,6 +14,7 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
 using VeraDemoNet.DataAccess;
+using VeraDemoNet.Helper;
 using VeraDemoNet.Models;
 
 namespace VeraDemoNet.Controllers
@@ -436,6 +437,7 @@ namespace VeraDemoNet.Controllers
         public ActionResult PostRegister(string username)
         {
             logger.Info("PostRegister processRegister");
+            InputHelper.AssertDoesNotContainSpecialCharacters(username);
             var registerViewModel = new RegisterViewModel();
 
             Session["username"] = username;
