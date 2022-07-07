@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Reflection;
 using System.Text;
+using System.Web;
 using System.Web.Mvc;
 using VeraDemoNet.Commands;
 using VeraDemoNet.DataAccess;
@@ -208,7 +209,7 @@ namespace VeraDemoNet.Controllers
                 dbContext.Database.Connection.Open();
                 dbContext.Database.ExecuteSqlCommand(sqlAddBlab,
                     new SqlParameter { ParameterName = "@username", Value = username },
-                    new SqlParameter { ParameterName = "@blabcontents", Value = blab },
+                    new SqlParameter { ParameterName = "@blabcontents", Value = HttpUtility.HtmlEncode(blab) },
                     new SqlParameter { ParameterName = "@timestamp", Value = DateTime.Now });
             }
 
