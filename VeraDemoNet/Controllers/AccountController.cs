@@ -16,6 +16,7 @@ using System.Web.Mvc;
 using VeraDemoNet.DataAccess;
 using VeraDemoNet.Helper;
 using VeraDemoNet.Models;
+using VeraDemoNet.Models.View;
 
 namespace VeraDemoNet.Controllers
 {
@@ -540,7 +541,7 @@ namespace VeraDemoNet.Controllers
         }
 
         [HttpPost, ActionName("RegisterFinish")]
-        public ActionResult PostRegisterFinish(User user, string cpassword)
+        public ActionResult PostRegisterFinish(UserCreateModel user, string cpassword)
         {
             if (user.Password != cpassword)
             {
@@ -555,12 +556,18 @@ namespace VeraDemoNet.Controllers
             }
 
             // Use the user class to get the hashed password.
-            user.Password = Md5Hash(user.Password);
-            user.CreatedAt = DateTime.Now;
+            var dbUser = new User
+            {
+                Password = Md5Hash(user.Password),
+                CreatedAt = DateTime.Now,
+                UserName = user.UserName,
+                RealName = user.RealName,
+                BlabName = user.BlabName
+            };
 
             using (var dbContext = new BlabberDB())
             {
-                dbContext.Users.Add(user);
+                dbContext.Users.Add(dbUser);
                 dbContext.SaveChanges();
             }
 
