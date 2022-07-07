@@ -34,7 +34,7 @@ namespace VeraDemoNet.Controllers
         [HttpGet, ActionName("Login")]
         public ActionResult GetLogin(string ReturnUrl = "")
         {
-            logger.Info("Login page visited: " + ReturnUrl);
+            logger.Info("Login page visited: " + HttpUtility.HtmlEncode(ReturnUrl));
 
             if (IsUserLoggedIn())
             {
