@@ -4,9 +4,15 @@ namespace VeraDemoNet.Controllers
 {
     public class ErrorController : Controller
     {
-        public ActionResult AccessDenied()  
-        {  
-            return View();  
-        }  
+        [HttpGet]
+        public ActionResult Error()
+        {
+            return View();
+        }
+
+        public ActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }
