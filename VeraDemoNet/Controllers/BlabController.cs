@@ -94,7 +94,7 @@ namespace VeraDemoNet.Controllers
             {
                 dbContext.Database.Connection.Open();
                 var searchBlabs = dbContext.Database.Connection.CreateCommand();
-                searchBlabs.CommandText = string.Format(sqlSearchBlabs, searchText);
+                searchBlabs.CommandText = string.Format(sqlSearchBlabs, searchText.Replace("'", "''"));
 
                 var searchBlabsResults = searchBlabs.ExecuteReader();
                 while (searchBlabsResults.Read())

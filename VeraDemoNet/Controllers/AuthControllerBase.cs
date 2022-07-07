@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Mvc;
@@ -8,6 +8,9 @@ namespace VeraDemoNet.Controllers
 {
     public abstract class AuthControllerBase : Controller
     {
+        private string sqlUser =
+            "select username, real_name as realname, blab_name as blabname, is_admin as isadmin from users where username = @username and password = @password";
+
         protected BasicUser LoginUser(string userName, string passWord)
         {
             if (string.IsNullOrEmpty(userName))
@@ -17,14 +20,23 @@ namespace VeraDemoNet.Controllers
 
             using (var dbContext = new BlabberDB())
             {
-                var found = dbContext.Database.SqlQuery<BasicUser>(
-                    "select username, real_name as realname, blab_name as blabname, is_admin as isadmin from users where username ='"
-                    + userName + "' and password='" + Md5Hash(passWord) + "';").ToList();
+                dbContext.Database.Connection.Open();
+                var userCommand = dbContext.Database.Connection.CreateCommand();
+                userCommand.CommandText = sqlUser;
+                userCommand.Parameters.Add(new SqlParameter("@username", userName));
+                userCommand.Parameters.Add(new SqlParameter("@password", Md5Hash(passWord)));
+                var result = userCommand.ExecuteReader();
 
-                if (found.Count != 0)
+                if (result.Read())
                 {
                     Session["username"] = userName;
-                    return found[0];
+                    return new BasicUser
+                    {
+                        UserName = result.GetString(0),
+                        RealName = result.GetString(1),
+                        BlabName = result.GetString(2),
+                        IsAdmin = result.GetBoolean(3)
+                    };
                 }
             }
 
